@@ -1,0 +1,17 @@
+/* HomiePG Global CSS - Web baseline styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+:root {
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-rounded: system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
+}
