@@ -1,0 +1,27 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const user_controller_1 = require("./user.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const client_1 = require("@prisma/client");
+const router = (0, express_1.Router)();
+const controller = new user_controller_1.UserController();
+// Protect all routes under /api/v1/user
+router.use(auth_middleware_1.requireAuth);
+router.use((0, auth_middleware_1.requireRole)([client_1.UserRole.USER]));
+router.get('/profile', controller.getProfile);
+router.put('/profile', controller.updateProfile);
+router.get('/properties', controller.searchProperties);
+router.get('/properties/:id', controller.getPropertyDetail);
+router.get('/favorites', controller.getFavorites);
+router.post('/properties/:id/favorite', controller.addFavorite);
+router.delete('/properties/:id/favorite', controller.removeFavorite);
+router.get('/bookings', controller.getBookings);
+router.post('/bookings', controller.createBooking);
+router.post('/bookings/:id/cancel', controller.cancelBooking);
+router.get('/complaints', controller.getComplaints);
+router.post('/complaints', controller.createComplaint);
+router.get('/notifications', controller.getNotifications);
+router.put('/notifications/:id/read', controller.markNotificationAsRead);
+router.post('/reviews', controller.createReview);
+exports.default = router;

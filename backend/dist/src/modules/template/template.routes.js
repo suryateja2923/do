@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const template_controller_1 = require("./template.controller");
+const validation_middleware_1 = require("../../middlewares/validation.middleware");
+const template_validator_1 = require("./validators/template.validator");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const client_1 = require("@prisma/client");
+const router = (0, express_1.Router)();
+exports.router = router;
+const controller = new template_controller_1.TemplateController();
+router.get('/', auth_middleware_1.requireAuth, (0, auth_middleware_1.requireRole)([client_1.UserRole.ADMIN, client_1.UserRole.OWNER]), controller.getTemplates);
+router.get('/:id', auth_middleware_1.requireAuth, controller.getTemplateById);
+router.post('/', auth_middleware_1.requireAuth, (0, auth_middleware_1.requireRole)([client_1.UserRole.ADMIN]), (0, validation_middleware_1.validateRequest)(template_validator_1.createTemplateSchema), controller.createTemplate);
+exports.default = router;

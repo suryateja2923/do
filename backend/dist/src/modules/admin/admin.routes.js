@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const admin_controller_1 = require("./admin.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const client_1 = require("@prisma/client");
+const router = (0, express_1.Router)();
+const ctrl = new admin_controller_1.AdminController();
+// All admin routes require ADMIN role
+router.use(auth_middleware_1.requireAuth, (0, auth_middleware_1.requireRole)([client_1.UserRole.ADMIN]));
+router.get('/dashboard-stats', ctrl.getDashboardStats);
+router.get('/owners', ctrl.getOwners);
+router.post('/owners/:id/verify', ctrl.verifyOwner);
+router.get('/properties', ctrl.getProperties);
+router.post('/properties/:id/verify', ctrl.verifyProperty);
+router.get('/bookings', ctrl.getBookings);
+router.get('/complaints', ctrl.getComplaints);
+router.get('/managers', ctrl.getManagers);
+router.get('/users', ctrl.getUsers);
+router.get('/payments', ctrl.getPayments);
+exports.default = router;

@@ -1,0 +1,5 @@
+{"level":"info","message":"✔ Database connection established cleanly.","timestamp":"2026-07-01 11:40:06:406"}
+{"level":"info","message":"🚀 Server running in [development] mode on http://localhost:3000","timestamp":"2026-07-01 11:40:06:406"}
+{"level":"info","message":"📖 API documentation available on http://localhost:3000/api-docs","timestamp":"2026-07-01 11:40:06:406"}
+{"level":"http","message":"::1 - GET /api/v1/health 200 - 105.763 ms","timestamp":"2026-07-01 11:41:32:4132"}
+{"level":"http","message":"::1 - GET /api-docs/ 200 - 1.287 ms","timestamp":"2026-07-01 11:41:42:4142"}
