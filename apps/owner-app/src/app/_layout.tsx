@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { useColorScheme, Platform } from 'react-native';
+import { useColorScheme, Platform, AppState } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/theme';
+import { connectSocket, disconnectSocket } from '@/api/socketClient';
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,20 @@ export default function RootLayout() {
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Keep the realtime notification socket connected while logged in
+  useEffect(() => {
+    if (!token) {
+      disconnectSocket();
+      return;
+    }
+    connectSocket();
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') connectSocket();
+    });
+    return () => subscription.remove();
+  }, [token]);
 
   // Handle Authentication and Verification Guard redirects
   useEffect(() => {

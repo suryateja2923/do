@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,9 @@ import { useRouter } from 'expo-router';
 import { Card, Button, useThemeColors } from '@/shared';
 import { Spacing } from '@/constants/theme';
 import { useApi } from '@/hooks/useShared';
+import { useNotificationSocket } from '@/hooks/useNotificationSocket';
 import { DashboardService } from '../services/dashboardService';
+import { NotificationService } from '@/features/notifications/services/notificationService';
 import {
   Building as IconBuilding,
   Bed as IconBed,
@@ -22,6 +24,7 @@ import {
   BarChart as IconBarChart,
   History as IconHistory,
   FileText as IconFileText,
+  Bell as IconBell,
 } from 'lucide-react-native';
 const Building = IconBuilding as any;
 const Bed = IconBed as any;
@@ -31,12 +34,19 @@ const PlusCircle = IconPlusCircle as any;
 const BarChart = IconBarChart as any;
 const History = IconHistory as any;
 const FileText = IconFileText as any;
+const Bell = IconBell as any;
 
 export const DashboardMain: React.FC = () => {
   const colors = useThemeColors();
   const router = useRouter();
-  
+
   const { data: stats, loading, execute: refetch } = useApi(DashboardService.getStats, true);
+  const { data: notificationsData, execute: refetchNotifications } = useApi(NotificationService.list, true);
+  const unreadCount = (notificationsData ?? []).filter((n) => !n.is_read).length;
+
+  // Live push: a new notification bumps the bell badge without waiting for a refresh
+  useNotificationSocket(useCallback(() => { refetchNotifications(); }, [refetchNotifications]));
+
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -81,11 +91,24 @@ export const DashboardMain: React.FC = () => {
       }
     >
       {/* 1. Welcoming Title */}
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Dashboard</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Real-time PG Business Operations
-        </Text>
+      <View style={[styles.header, styles.headerRow]}>
+        <View>
+          <Text style={[styles.title, { color: colors.text }]}>Dashboard</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Real-time PG Business Operations
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push('/notifications')}
+          style={[styles.bellBtn, { backgroundColor: colors.backgroundElement }]}
+        >
+          <Bell color={colors.text} size={20} />
+          {unreadCount > 0 && (
+            <View style={styles.bellBadge}>
+              <Text style={styles.bellBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* 2. Quick Actions */}
@@ -246,6 +269,35 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: Spacing.one,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  bellBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bellBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  bellBadgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '800',
   },
   title: {
     fontSize: 24,

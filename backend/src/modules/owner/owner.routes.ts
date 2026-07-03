@@ -51,6 +51,7 @@ router.post('/complaints/:id/assign', requireOwnerResourceOwnership('complaint',
 router.post('/complaints/:id/status', requireOwnerResourceOwnership('complaint', 'id'), ctrl.updateComplaintStatus);
 
 router.get('/notifications', ctrl.getNotifications);
+router.put('/notifications/:id/read', ctrl.markNotificationAsRead);
 router.post('/notifications/send', ctrl.sendNotification);
 
 router.get('/reports', ctrl.getReports);

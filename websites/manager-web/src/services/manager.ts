@@ -53,9 +53,6 @@ export class ManagerService {
    */
   public static async getDashboardStats(): Promise<ManagerDashboardStats> {
     const response: any = await api.get('/manager/dashboard-stats');
-  public static async getOwners(): Promise<OwnerProfile[]> {
-    const response: any = await api.get('/manager/owners');
-    return response.data as OwnerProfile[];
     return response.data as ManagerDashboardStats;
   }
 
@@ -64,9 +61,6 @@ export class ManagerService {
    */
   public static async getOwners(): Promise<OwnerProfile[]> {
     const response: any = await api.get('/manager/owners');
-  public static async getVerificationHistory(id: string): Promise<VerificationHistoryItem[]> {
-    const response: any = await api.get(`/manager/verification-history/${id}`);
-    return response.data as VerificationHistoryItem[];
     return response.data as OwnerProfile[];
   }
 
@@ -75,9 +69,6 @@ export class ManagerService {
    */
   public static async verifyOwner(id: string, status: OwnerProfile['kyc_status'], notes: string): Promise<void> {
     await api.post(`/manager/owners/${id}/verify`, { status, notes });
-  public static async getProperties(): Promise<Property[]> {
-    const response: any = await api.get('/manager/properties');
-    return response.data as Property[];
   }
 
   /**
@@ -85,9 +76,6 @@ export class ManagerService {
    */
   public static async requestOwnerDocuments(id: string, documentTypes: string[], notes: string): Promise<void> {
     await api.post(`/manager/owners/${id}/request-docs`, { documentTypes, notes });
-  public static async getBookings(): Promise<Booking[]> {
-    const response: any = await api.get('/manager/bookings');
-    return response.data as Booking[];
   }
 
   /**
@@ -95,9 +83,6 @@ export class ManagerService {
    */
   public static async suspendOwner(id: string, notes: string): Promise<void> {
     await api.post(`/manager/owners/${id}/suspend`, { notes });
-  public static async getComplaints(): Promise<Complaint[]> {
-    const response: any = await api.get('/manager/complaints');
-    return response.data as Complaint[];
   }
 
   /**
@@ -105,9 +90,6 @@ export class ManagerService {
    */
   public static async getVerificationHistory(id: string): Promise<VerificationHistoryItem[]> {
     const response: any = await api.get(`/manager/verification-history/${id}`);
-  public static async getTasks(): Promise<ManagerTask[]> {
-    const response: any = await api.get('/manager/tasks');
-    return response.data as ManagerTask[];
     return response.data as VerificationHistoryItem[];
   }
 
@@ -116,9 +98,6 @@ export class ManagerService {
    */
   public static async getProperties(): Promise<Property[]> {
     const response: any = await api.get('/manager/properties');
-  public static async getReports(category: 'VERIFICATION' | 'COMPLAINTS' | 'OPERATIONAL' | 'PROPERTY'): Promise<any[]> {
-    const response: any = await api.get(`/manager/reports?category=${category}`);
-    return response.data as any[];
     return response.data as Property[];
   }
 
@@ -130,9 +109,6 @@ export class ManagerService {
   }
 
   /**
-  public static async searchAll(query: string): Promise<{
-    owners: OwnerProfile[];
-    properties: Property[];
    * Action: Request Property Corrections
    */
   public static async requestPropertyCorrections(id: string, corrections: string[], notes: string): Promise<void> {

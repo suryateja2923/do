@@ -3,8 +3,10 @@ import { app } from './app';
 import { env } from './config/env';
 import { prisma } from './config/database';
 import { logger } from './config/logger';
+import { initSocket } from './realtime/socket';
 
 const server = http.createServer(app);
+initSocket(server);
 
 const startServer = async () => {
   try {

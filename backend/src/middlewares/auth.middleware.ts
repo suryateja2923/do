@@ -40,6 +40,15 @@ function verifyStandardJWT(token: string): any {
 }
 
 /**
+ * Resolve a bearer token to its decoded payload, trying our own JWT signer first
+ * then falling back to the legacy Supabase HMAC path. Shared by the HTTP auth
+ * middleware and the WebSocket handshake so both accept the same tokens.
+ */
+export function resolveAuthToken(token: string): any | null {
+  return verifyStandardJWT(token) || verifyHMAC(token, env.SUPABASE_JWT_SECRET);
+}
+
+/**
  * Authentication Middleware: Validates JWT and binds User Context
  */
 export const requireAuth = async (
@@ -56,7 +65,7 @@ export const requireAuth = async (
     const token = authHeader.split(' ')[1];
 
     // Try standard JWT first (our auth module), then HMAC fallback (Supabase)
-    let payload = verifyStandardJWT(token) || verifyHMAC(token, env.SUPABASE_JWT_SECRET);
+    let payload = resolveAuthToken(token);
 
     if (!payload || !payload.sub) {
       throw new UnauthorizedException('Invalid or expired authentication token');

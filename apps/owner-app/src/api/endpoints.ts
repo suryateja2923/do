@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
   },
   NOTIFICATIONS: {
     LIST: '/owner/notifications',
+    MARK_READ: (id: string) => `/owner/notifications/${id}/read`,
     SEND: '/owner/notifications/send',
   },
   REPORTS: {

@@ -1,20 +1,51 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { ManagerService } from '@/services/manager';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { OwnerProfile } from '@/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { managerQueryKeys } from '@/lib/queryKeys';
+import { QUERY_POLICY } from '@/config/queryPolicy';
 import { Card, Button } from '@/shared';
-import { Bell, Send, Megaphone, Check } from 'lucide-react';
+import { Bell, Send, Megaphone, Check, User as UserIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const NotificationsCenter: React.FC = () => {
   const queryClient = useQueryClient();
 
+  const { data: owners = [] } = useQuery<OwnerProfile[]>({
+    queryKey: managerQueryKeys.owners,
+    queryFn: ManagerService.getOwners,
+    retry: QUERY_POLICY.RETRY_COUNT,
+  });
+
   // Direct alert states
   const [targetUser, setTargetUser] = useState('');
+  const [selectedOwnerLabel, setSelectedOwnerLabel] = useState<string | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsBlurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [directTitle, setDirectTitle] = useState('');
   const [directMessage, setDirectMessage] = useState('');
+
+  const ownerSuggestions = useMemo(() => {
+    const query = targetUser.trim().toLowerCase();
+    if (!query) return owners.slice(0, 8);
+    return owners
+      .filter((owner) => {
+        const haystack = [
+          owner.user?.first_name,
+          owner.user?.last_name,
+          owner.user?.email,
+          owner.company_name,
+          owner.user_id,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(query);
+      })
+      .slice(0, 8);
+  }, [owners, targetUser]);
 
   // Announcement states
   const [broadcastTitle, setBroadcastTitle] = useState('');
@@ -51,6 +82,7 @@ export const NotificationsCenter: React.FC = () => {
       await sendNotificationMutation.mutateAsync({ userId: targetUser, title: directTitle, content: directMessage });
       toast.success('Alert sent successfully');
       setTargetUser('');
+      setSelectedOwnerLabel(null);
       setDirectTitle('');
       setDirectMessage('');
     } catch (err: any) {
@@ -99,15 +131,59 @@ export const NotificationsCenter: React.FC = () => {
         </div>
 
         <form onSubmit={handleSendDirect} className="space-y-4 text-xs">
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 relative">
             <label className="text-xs font-bold text-muted-foreground">Recipient User ID</label>
             <input
               type="text"
               value={targetUser}
-              onChange={(e) => setTargetUser(e.target.value)}
-              placeholder="Enter owner/user id from live records..."
+              onChange={(e) => {
+                setTargetUser(e.target.value);
+                setSelectedOwnerLabel(null);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => {
+                // delay so a click on a suggestion registers before the list unmounts
+                suggestionsBlurTimeout.current = setTimeout(() => setShowSuggestions(false), 150);
+              }}
+              placeholder="Search PG owners by name, email, or paste a user id..."
+              autoComplete="off"
               className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs outline-none focus:border-primary"
             />
+            {selectedOwnerLabel && (
+              <p className="text-[11px] text-primary flex items-center gap-1 pt-0.5">
+                <Check className="h-3 w-3" /> {selectedOwnerLabel}
+              </p>
+            )}
+            {showSuggestions && ownerSuggestions.length > 0 && (
+              <div className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-border bg-background shadow-xl">
+                {ownerSuggestions.map((owner) => {
+                  const name = [owner.user?.first_name, owner.user?.last_name].filter(Boolean).join(' ') || 'Unnamed owner';
+                  return (
+                    <button
+                      key={owner.id}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        if (suggestionsBlurTimeout.current) clearTimeout(suggestionsBlurTimeout.current);
+                        setTargetUser(owner.user_id);
+                        setSelectedOwnerLabel(`${name} · ${owner.user?.email ?? 'no email'}`);
+                        setShowSuggestions(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-primary/10 border-b border-border last:border-b-0"
+                    >
+                      <div className="h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <UserIcon className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold truncate">{name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{owner.user?.email ?? owner.user_id}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">

@@ -405,6 +405,16 @@ export class OwnerRepository {
     });
   }
 
+  async markNotificationAsRead(userId: string, notificationId: string) {
+    return prisma.notification.updateMany({
+      where: { id: notificationId, user_id: userId },
+      data: {
+        is_read: true,
+        read_at: new Date(),
+      },
+    });
+  }
+
   async sendNotification(userId: string, title: string, body: string, type: NotificationType = NotificationType.SYSTEM) {
     return prisma.$transaction(async (tx) => {
       const result = await NotificationService.create(tx, {
@@ -641,12 +651,7 @@ export class OwnerRepository {
     });
   }
 
-        comments: {
-          where: { is_deleted: false },
-          include: { user: true },
-          orderBy: { created_at: 'asc' },
-        },
-
+  async createFloor(ownerProfileId: string, propertyId: string, name: string) {
     const count = await prisma.floor.count({
       where: { property_id: propertyId, is_deleted: false },
     });

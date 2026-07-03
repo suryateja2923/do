@@ -1,4 +1,5 @@
-import { NotificationChannel, NotificationType, Prisma, PrismaClient } from '@prisma/client';
+import { NotificationChannel, NotificationQueueStatus, NotificationType, Prisma, PrismaClient } from '@prisma/client';
+import { getIO, isUserOnline, userRoom } from '../../realtime/socket';
 
 type DbClient = Prisma.TransactionClient | PrismaClient;
 
@@ -35,6 +36,19 @@ export class NotificationService {
         },
       }),
     ]);
+
+    // Live delivery: push straight to the recipient's socket if they're connected now.
+    const deliveredLive = isUserOnline(payload.userId);
+    if (deliveredLive) {
+      getIO()?.to(userRoom(payload.userId)).emit('notification:new', notification);
+
+      if (channel === NotificationChannel.PUSH) {
+        await db.notificationQueue.update({
+          where: { id: queueItem.id },
+          data: { status: NotificationQueueStatus.SENT, delivery_time: new Date() },
+        });
+      }
+    }
 
     return { notification, queueItem };
   }

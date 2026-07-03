@@ -124,6 +124,10 @@ export class OwnerService {
     return this.repo.getNotifications(userId);
   }
 
+  async markNotificationAsRead(userId: string, notificationId: string) {
+    return this.repo.markNotificationAsRead(userId, notificationId);
+  }
+
   async sendNotification(userId: string, title: string, body: string, type?: string) {
     return this.repo.sendNotification(userId, title, body, (type as NotificationType) || NotificationType.SYSTEM);
   }

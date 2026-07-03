@@ -45,9 +45,12 @@ app.use(
 app.use(loggerMiddleware);
 
 // 5. Rate Limiter
+// Multiple local frontends (manager-web, owner-app, admin-web, ...) share one IP
+// against this single backend in development, so the production limit is far too
+// low there — it was tripping in normal day-to-day local usage, not abuse.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  max: env.NODE_ENV === 'production' ? 100 : 5000, // Limit each IP to N requests per window
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {

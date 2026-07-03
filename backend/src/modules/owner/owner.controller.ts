@@ -379,6 +379,16 @@ export class OwnerController {
       next(error);
     }
   };
+  public markNotificationAsRead = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = this.getUserId();
+      const { id } = req.params as any;
+      const result = await this.service.markNotificationAsRead(userId, id);
+      ApiResponse.success(res, result, 'Notification marked as read');
+    } catch (error) {
+      next(error);
+    }
+  };
   public sendNotification = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, title, body, type } = req.body;
