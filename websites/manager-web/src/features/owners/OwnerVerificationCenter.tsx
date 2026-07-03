@@ -25,13 +25,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+const EMPTY_OWNERS: OwnerProfile[] = [];
+
 export const OwnerVerificationCenter: React.FC = () => {
   const searchParams = useSearchParams();
   const initialId = searchParams.get('id');
   const queryClient = useQueryClient();
 
   const {
-    data: owners = [],
+    data: owners = EMPTY_OWNERS,
     isLoading: loading,
     error,
     refetch: fetchOwners,
@@ -49,7 +51,7 @@ export const OwnerVerificationCenter: React.FC = () => {
     status: 'ALL' as 'ALL' | OwnerProfile['kyc_status'],
   });
 
-  const { query: search, setQuery: setSearch, filteredItems: searchedOwners } = useSearch(owners || [], [
+  const { query: search, setQuery: setSearch, filteredItems: searchedOwners } = useSearch(owners, [
     'company_name',
   ]);
 

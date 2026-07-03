@@ -237,7 +237,7 @@ export const DashboardMain: React.FC = () => {
         </View>
 
         <View style={styles.activityList}>
-          {stats?.recentActivities.map((act) => (
+          {stats?.recentActivities?.map((act) => (
             <View key={act.id} style={styles.activityItem}>
               <View style={styles.activityIndicatorDot} />
               <View style={{ flex: 1 }}>

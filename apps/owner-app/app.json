@@ -37,6 +37,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "apiUrl": "http://192.168.1.11:2000/api/v1"
     }
   }
 }

@@ -18,9 +18,9 @@ export default function FloorManagementScreen() {
   const router = useRouter();
 
   const { data: property, loading, execute: refetch } = useApi(
-    () => PropertyService.getPropertyDetail(propertyId),
+    PropertyService.getPropertyDetail,
     true,
-    []
+    [propertyId]
   );
 
   const [newFloorName, setNewFloorName] = useState('');
@@ -39,7 +39,7 @@ export default function FloorManagementScreen() {
     try {
       await PropertyService.updateFloor(propertyId, editingFloorId, editingFloorName);
       setEditModalVisible(false);
-      await refetch();
+      await refetch(propertyId);
     } catch {
       alert('Failed to update floor name');
     } finally {
@@ -57,7 +57,7 @@ export default function FloorManagementScreen() {
     try {
       await PropertyService.addFloor(propertyId, newFloorName);
       setNewFloorName('');
-      await refetch();
+      await refetch(propertyId);
     } catch {
       alert('Failed to add floor');
     } finally {
@@ -84,7 +84,7 @@ export default function FloorManagementScreen() {
           style: 'destructive',
           onPress: async () => {
             await PropertyService.deleteFloor(propertyId, floorId);
-            refetch();
+            refetch(propertyId);
           },
         },
       ]

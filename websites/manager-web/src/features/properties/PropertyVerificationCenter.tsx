@@ -28,13 +28,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+const EMPTY_PROPERTIES: ManagerProperty[] = [];
+
 export const PropertyVerificationCenter: React.FC = () => {
   const searchParams = useSearchParams();
   const initialId = searchParams.get('id');
   const queryClient = useQueryClient();
 
   const {
-    data: properties = [],
+    data: properties = EMPTY_PROPERTIES,
     isLoading: loading,
     error,
     refetch: fetchProperties,
@@ -51,7 +53,7 @@ export const PropertyVerificationCenter: React.FC = () => {
     status: 'ALL' as 'ALL' | ManagerProperty['kyc_status'],
   });
 
-  const { query: search, setQuery: setSearch, filteredItems: searchedProps } = useSearch(properties || [], ['name']);
+  const { query: search, setQuery: setSearch, filteredItems: searchedProps } = useSearch(properties, ['name']);
 
   // Actions states
   const [notes, setNotes] = useState('');

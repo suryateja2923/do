@@ -18,9 +18,9 @@ export default function RoomManagementScreen() {
   const router = useRouter();
 
   const { data: property, loading, execute: refetch } = useApi(
-    () => PropertyService.getPropertyDetail(propertyId),
+    PropertyService.getPropertyDetail,
     true,
-    []
+    [propertyId]
   );
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -52,7 +52,7 @@ export default function RoomManagementScreen() {
         room_type: editingRoomType,
       });
       setEditModalVisible(false);
-      await refetch();
+      await refetch(propertyId);
     } catch {
       alert('Failed to update room details');
     } finally {
@@ -76,7 +76,7 @@ export default function RoomManagementScreen() {
       });
       setRoomNumber('');
       setModalVisible(false);
-      await refetch();
+      await refetch(propertyId);
     } catch {
       alert('Failed to add room');
     } finally {
@@ -103,7 +103,7 @@ export default function RoomManagementScreen() {
           style: 'destructive',
           onPress: async () => {
             await PropertyService.deleteRoom(roomId);
-            refetch();
+            refetch(propertyId);
           },
         },
       ]

@@ -20,11 +20,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+const EMPTY_TASKS: ManagerTask[] = [];
+
 export const TasksCenter: React.FC = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: tasks = [],
+    data: tasks = EMPTY_TASKS,
     isLoading: loading,
     error,
     refetch: fetchTasks,
@@ -41,7 +43,7 @@ export const TasksCenter: React.FC = () => {
     status: 'ALL' as 'ALL' | ManagerTask['status'],
   });
 
-  const { query: search, setQuery: setSearch, filteredItems: searchedTasks } = useSearch(tasks || [], [
+  const { query: search, setQuery: setSearch, filteredItems: searchedTasks } = useSearch(tasks, [
     'title',
     'description',
     'priority',

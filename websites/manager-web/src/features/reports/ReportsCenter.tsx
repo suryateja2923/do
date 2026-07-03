@@ -10,15 +10,17 @@ import { toast } from 'sonner';
 
 type ReportCategory = 'VERIFICATION' | 'COMPLAINTS' | 'OPERATIONAL' | 'PROPERTY';
 
+const EMPTY_REPORTS: any[] = [];
+
 export const ReportsCenter: React.FC = () => {
   const [category, setCategory] = useState<ReportCategory>('VERIFICATION');
-  
-  const { data: reports = [], loading, execute: fetchReports } = useApi(
+
+  const { data: reports, loading, execute: fetchReports } = useApi(
     () => ManagerService.getReports(category),
     true
   );
 
-  const { query: search, setQuery: setSearch, filteredItems: searchedReports } = useSearch(reports || [], [
+  const { query: search, setQuery: setSearch, filteredItems: searchedReports } = useSearch(reports ?? EMPTY_REPORTS, [
     'type',
     'details',
     'status',

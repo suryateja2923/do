@@ -22,11 +22,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+const EMPTY_BOOKINGS: Booking[] = [];
+
 export const BookingVerificationCenter: React.FC = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: bookings = [],
+    data: bookings = EMPTY_BOOKINGS,
     isLoading: loading,
     error,
     refetch: fetchBookings,
@@ -43,7 +45,7 @@ export const BookingVerificationCenter: React.FC = () => {
     status: 'ALL' as 'ALL' | Booking['status'],
   });
 
-  const { query: search, setQuery: setSearch, filteredItems: searchedBookings } = useSearch(bookings || [], [
+  const { query: search, setQuery: setSearch, filteredItems: searchedBookings } = useSearch(bookings, [
     'status',
   ]);
 

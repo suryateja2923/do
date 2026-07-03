@@ -19,9 +19,9 @@ export default function PropertyDetailsScreen() {
   const [uploading, setUploading] = useState(false);
 
   const { data: property, loading, execute: refetch } = useApi(
-    () => PropertyService.getPropertyDetail(id),
+    PropertyService.getPropertyDetail,
     true,
-    []
+    [id]
   );
 
   if (loading) {
@@ -59,7 +59,7 @@ export default function PropertyDetailsScreen() {
             const base64data = reader.result as string;
             await PropertyService.uploadSingleImage(id, base64data);
             Alert.alert('Success', 'Image uploaded successfully!');
-            refetch();
+            refetch(id);
           } catch (err: any) {
             Alert.alert('Error', err.message || 'Failed to upload image.');
           } finally {

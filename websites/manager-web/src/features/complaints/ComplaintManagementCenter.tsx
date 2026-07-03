@@ -22,11 +22,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+const EMPTY_COMPLAINTS: Complaint[] = [];
+
 export const ComplaintManagementCenter: React.FC = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: complaints = [],
+    data: complaints = EMPTY_COMPLAINTS,
     isLoading: loading,
     error,
     refetch: fetchComplaints,
@@ -43,7 +45,7 @@ export const ComplaintManagementCenter: React.FC = () => {
     status: 'ALL' as 'ALL' | Complaint['status'],
   });
 
-  const { query: search, setQuery: setSearch, filteredItems: searchedComplaints } = useSearch(complaints || [], [
+  const { query: search, setQuery: setSearch, filteredItems: searchedComplaints } = useSearch(complaints, [
     'title',
     'description',
   ]);
